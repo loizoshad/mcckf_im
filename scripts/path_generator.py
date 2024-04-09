@@ -77,7 +77,7 @@ class PathGenerator:
         plt.show()
 
     def run(self):
-        first_time = False
+        first_time = True
         rate = rospy.Rate(10)
         while not rospy.is_shutdown():
             

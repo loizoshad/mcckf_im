@@ -2,7 +2,6 @@
 
 <launch>
   <!-- start Webots -->
- 
   <arg name="no_gui" default="false," doc="Start Webots with minimal GUI"/>
   <include file="$(find webots_ros)/launch/webots.launch">
     <arg name="mode" value="realtime"/>

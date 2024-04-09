@@ -10,7 +10,7 @@ from sensor_msgs.msg import Imu
 from geometry_msgs.msg import PointStamped
 from colorama import Fore, Back, Style
 
-class MCKF():
+class MCCKF():
     def __init__(self):
         self.init_model()
         self.init_weights()
@@ -205,5 +205,5 @@ class MCKF():
 
 if __name__ == '__main__':
     rospy.init_node('maximum_correntropy_kalman_filter', anonymous=True)
-    mc_kf = MCKF()
+    mc_kf = MCCKF()
     mc_kf.run()

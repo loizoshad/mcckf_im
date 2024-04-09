@@ -111,10 +111,10 @@ class DataLogger:
                     plt.figure()
                     plt.plot(true_state_data[:, 0], true_state_data[:, 1], label='Ground truth')
                     plt.plot(interm_kf_data[:, 0], interm_kf_data[:, 1], label='KF')
-                    plt.plot(mckf_data[:, 0], mckf_data[:, 1], label='MCKF')
+                    plt.plot(mckf_data[:, 0], mckf_data[:, 1], label='MCCKF')
                     plt.legend(); plt.grid()
                     plt.xlabel('Position - x [m]'); plt.ylabel('Position - y [m]')
-                    plt.title('Ground truth, KF, and MCKF')
+                    plt.title('Ground truth, KF, and MCCKF')
                     # Save figure 
                     plt.savefig(os.path.join(abs_path, test_num + '.png'), format='png')
                     plt.show()
@@ -152,8 +152,8 @@ class DataLogger:
                     # print('KF RMSE x: {:.6f} m'.format(kf_rmse_x))
                     # print('KF RMSE y: {:.6f} m'.format(kf_rmse_y))                    
                     
-                    print("MCKF RMSE x: {:.6f} m".format(mckf_rmse_x))
-                    print("MCKF RMSE y: {:.6f} m".format(mckf_rmse_y))
+                    print("MCCKF RMSE x: {:.6f} m".format(mckf_rmse_x))
+                    print("MCCKF RMSE y: {:.6f} m".format(mckf_rmse_y))
 
 
 

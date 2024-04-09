@@ -6,17 +6,16 @@ EXTERNPROTO "../protos/RectangleArena.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/dji/mavic/protos/Mavic2Pro.proto"
 EXTERNPROTO "../protos/Wall.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/drinks/protos/Can.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/paintings/protos/PortraitPainting.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/fruits/protos/Apple.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/kitchen/breakfast/protos/BiscuitBox.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/kitchen/breakfast/protos/JamJar.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/tables/protos/Desk.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/computers/protos/Laptop.proto"
 
 WorldInfo {
 }
 Viewpoint {
-  orientation 0.3232389227653193 -0.3205404427489261 -0.8903765626811154 4.588206481037039
-  position 3.8278676009718082 -10.420540041828392 9.783283104974748
+  orientation -0.2253955740801971 0.7542254045210919 0.6167178239357558 0.9024698951939628
+  position -9.4711745927494 -9.08559897506248 15.040029402985377
 }
 TexturedBackground {
 }
@@ -25,92 +24,73 @@ TexturedBackgroundLight {
 RectangleArena {
   translation -0.0170948 -0.00533545 -0.04
 }
-Laptop {
-  translation 16.32 -4.27 0.75
-  rotation 0 0 1 1.5708
-  name "laptop(3)"
-}
 Desk {
-  translation 11.79 3.97 0
+  translation 10.56 -1.82 0
   rotation 0 0 -1 -5.307179586466759e-06
 }
 Desk {
-  translation 16.08 -4.34 0
-  rotation 0 0 1 -1.5707953071795862
-  name "desk(6)"
-}
-Desk {
-  translation 15.95 1.4 0
+  translation 10.55 1.39999 0
   rotation 0 0 -1 -5.307179586466759e-06
   name "desk(5)"
 }
 Desk {
-  translation 16.87 -0.389998 0
-  rotation 0 0 -1 -5.307179586466759e-06
-  name "desk(7)"
-}
-Desk {
-  translation 5.95 -0.979997 0
+  translation 3.45 -0.980008 0
   rotation 0 0 -1 -5.307179586466759e-06
   name "desk(4)"
 }
 DEF jam_jar_1 JamJar {
-  translation 11.98 3.57 0.71
-  name "jam_jar_1"
+  translation 10.74 -2.07 0.71
+  name "jam jar(1)"
 }
 DEF jam_jar_2 JamJar {
-  translation 15.82 -4.16 0.71
-  name "jam_jar_2"
+  translation 10.74 -1.29 0.71
+  name "jam jar(4)"
 }
 DEF jam_jar_3 JamJar {
-  translation 16.23 1.02 0.72
-  name "jam_jar_3"
+  translation 10.8 1.02 0.72
 }
 DEF jam_jar_4 JamJar {
-  translation 16.72 -0.82 0.72
-  name "jam_jar_4"
+  translation 10.8 1.62 0.72
+  name "jam jar(2)"
 }
 DEF jam_jar_5 JamJar {
-  translation 6.23 -1.48 0.72
-  name "jam_jar_5"
-}
-DEF biscuit_box_1 BiscuitBox {
-  translation 15.6 -4.45 0.71
-  name "biscuit_box_1"
+  translation 3.73 -1.48 0.72
+  name "jam jar(3)"
 }
 DEF apple_1 Apple {
-  translation 6.01 -0.46 0.77
-  name "apple_1"
+  translation 3.49 -0.46 0.77
 }
 DEF apple_2 Apple {
-  translation 15.99 1.88 0.77
-  name "apple_2"
+  translation 10.57 1.88 0.77
+  name "apple(1)"
 }
 DEF apple_3 Apple {
-  translation 17.02 -0.11 0.77
-  name "apple_3"
+  translation 10.4 -1.47 0.77
+  name "apple(3)"
 }
 DEF apple_4 Apple {
-  translation 11.81 4.33 0.77
-  name "apple_4"
+  translation 10.24 -2.36 0.77
+  name "apple(2)"
+}
+PortraitPainting {
+  translation -3.37 4.13 1.455
 }
 DEF can_1 Can {
-  translation 5.67 -0.94 0.78
-  name "can_1"
+  translation 3.16 -0.94 0.78
 }
 DEF can_2 Can {
-  translation 15.68 1.36 0.78
-  name "can_2"
+  translation 10.3 1.36 0.78
+  name "can(2)"
 }
 DEF can_3 Can {
-  translation 11.6 3.92 0.78
-  name "can_3"
+  translation 10.77 -2.33 0.78
+  name "can(3)"
 }
 Wall {
   translation -3.5 2.5 0
 }
 Wall {
-  translation 17.49 2.5 0
+  translation 11.67 2.5 0
   name "wall(21)"
 }
 Wall {
@@ -118,15 +98,11 @@ Wall {
   name "wall(1)"
 }
 Wall {
-  translation 6.5 -2.5 0
+  translation 4.01 -2.5 0
   name "wall(18)"
 }
 Wall {
-  translation 21.7 2.5 0
-  name "wall(15)"
-}
-Wall {
-  translation 21.7 -2.5 0
+  translation 11.67 -2.5 0
   name "wall(14)"
 }
 Wall {
@@ -150,16 +126,6 @@ Wall {
   name "wall(7)"
 }
 Wall {
-  translation 14.1 4.9 0
-  rotation 0 0 1 1.5708
-  name "wall(8)"
-}
-Wall {
-  translation 19.1 4.9 0
-  rotation 0 0 1 1.5708
-  name "wall(9)"
-}
-Wall {
   translation 4.1 -4.9 0
   rotation 0 0 1 1.5708
   name "wall(3)"
@@ -168,16 +134,6 @@ Wall {
   translation 9.1 -4.9 0
   rotation 0 0 1 1.5708
   name "wall(4)"
-}
-Wall {
-  translation 14.1 -4.9 0
-  rotation 0 0 1 1.5708
-  name "wall(11)"
-}
-Wall {
-  translation 19.1 -4.9 0
-  rotation 0 0 1 1.5708
-  name "wall(12)"
 }
 Mavic2Pro {
   controller "dji_controller"

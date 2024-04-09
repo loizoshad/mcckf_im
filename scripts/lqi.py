@@ -224,8 +224,6 @@ class LQI:
                 # Update reference if the target is reached
                 self.check_target_reached()
 
-            print(f'Goal: {self.ri.T}')
-
             # Anti-windup
             # Integral error (TODO: Keep this approach for the anti-windup at the time being)
             self.ie = self.ie + (self.ri - xi)     

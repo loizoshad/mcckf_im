@@ -1,4 +1,4 @@
-from controller import Supervisor
+from controller import Robot, Motor, Supervisor
 from scipy.optimize import fsolve
 import numpy as np
 import rospy
@@ -6,6 +6,8 @@ import rospy
 from std_msgs.msg import Float64MultiArray
 from sensor_msgs.msg import Imu
 from geometry_msgs.msg import PointStamped
+from nav_msgs.msg import Path
+from geometry_msgs.msg import PoseStamped
 # from mcc_kf.msg import detected_landmarks
 
 
@@ -66,9 +68,9 @@ class DjiController (Supervisor):
         self.camera.enable(self.time_step)
         self.camera.recognitionEnable(self.time_step)
 
-        self.gps = self.getDevice("gps")            # Use to get the true position of the robot
+        self.gps = self.getDevice("gps")    # Use to get the true position of the robot
         self.gps.enable(self.time_step)
-        self.gyro = self.getDevice("gyro")          # Use to get the true orientation of the robot
+        self.gyro = self.getDevice("gyro")  # Use to get the true orientation of the robot
         self.gyro.enable(self.time_step)
 
     def init_ros(self):
@@ -76,7 +78,7 @@ class DjiController (Supervisor):
         self.imu_pub = rospy.Publisher("dji/imu", Imu, queue_size=1)                                # IMU data
         self.imu_true_pub = rospy.Publisher("dji/imu_true", Imu, queue_size=1)                      # True IMU data
         self.camera_pos_pub = rospy.Publisher("dji/camera_position", PointStamped, queue_size=1)    # Position of the camera in the world frame
-        self.uwb_pos_pub = rospy.Publisher("dji/uwb_position", PointStamped, queue_size=1)          # UWB data
+        self.uwb_pos_pub = rospy.Publisher("dji/uwb_position", PointStamped, queue_size=1)                  # UWB data
         self.gps_pub = rospy.Publisher("dji/gps", PointStamped, queue_size=1)                       # True position of the robot
         self.gyro_pub = rospy.Publisher("dji/gyro", Float64MultiArray, queue_size=1)                # True angular velocity of the robot
         self.lin_vel_pub = rospy.Publisher("dji/lin_vel", Float64MultiArray, queue_size=1)          # True linear velocity of the robot
@@ -85,21 +87,20 @@ class DjiController (Supervisor):
         self.mot_vel = data.data
 
     def init_cam_local(self):
-        self.obj_def = ['apple_1', 'apple_2', 'apple_3', 'apple_4', 'can_1', 'can_2', 'can_3', 'jam_jar_1', 'jam_jar_2', 'jam_jar_3', 'jam_jar_4', 'jam_jar_5']
-        obj_positions = []; obj_ids = []
+        self.obj_ids = [1669, 1783, 1724, 1687, 1578, 1827, 1733, 1794, 1633, 1700, 1597, 1839, 1651, 1805, 1742, 1615, 1751, 1712, 1851, 1816]
+        positions = []; node_names = []
         # Get list of all existing nodes in the simulation
-        for name in self.obj_def:
-            try:
-                node = self.getFromDef(name)
-                obj_positions.append(np.array(node.getPosition()))
-            except:
-                print(f'Object Not Found {id} not found')
+        for id in self.obj_ids:
+            node = self.getFromId(id)
+            node_names.append(node.getTypeName())
+            positions.append(np.array(node.getPosition()))
+
 
         # Create dictionary of node ids and positions
         self.obj_info = {
-            'id': obj_ids,
-            'obj_def': self.obj_def,
-            'position': obj_positions
+            'id': self.obj_ids,
+            'name': node_names,
+            'position': positions
         }
 
     def init_uwb_local(self):
@@ -125,14 +126,42 @@ class DjiController (Supervisor):
         }
 
     def camera_compute_position(self):
+        true_pos = self.gps.getValues()
         # Compute the position of the camera in the world frame from info of each object
         position_ = []
-        for obj_def in self.detected_obj_info['obj_def']:
-            position_.append( self.obj_info['position'][self.obj_info['obj_def'].index(obj_def)] - self.detected_obj_info['position'][self.detected_obj_info['obj_def'].index(obj_def)] )
+        for id in self.detected_obj_info['id']:
+            position_.append( self.obj_info['position'][self.obj_info['id'].index(id)] - self.detected_obj_info['position'][self.detected_obj_info['id'].index(id)] )
 
         # Compute the average position for x, y, z
         position_ = np.array(position_)
         position = np.mean(position_, axis=0)
+
+
+        # # Print the estimated 'y' position of the camera for each landmark alongside the ID of the landmark (if the position is greater than 0.1 print in red, else in green using colorama)
+        # print(f'*****************************************************')
+        # for i in range(len(position_)):
+        #     if abs(position_[i,0] - true_pos[0]) > 0.2:
+        #         print(Fore.RED + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated x:' + str(position_[i,0] - true_pos[0]))
+        #     elif abs(position_[i,0] - true_pos[0]) > 0.1:
+        #         print(Fore.YELLOW + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated x:' + str(position_[i,0] - true_pos[0]))
+        #     else:
+        #         print(Fore.GREEN + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated x: ' + str(position_[i,0] - true_pos[0]))
+
+        #     if abs(position_[i,1] - true_pos[1]) > 0.2:
+        #         print(Fore.RED + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated y:' + str(position_[i,1] - true_pos[1]))
+        #     elif abs(position_[i,1] - true_pos[1]) > 0.1:
+        #         print(Fore.YELLOW + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated y:' + str(position_[i,1] - true_pos[1]))
+        #     else:
+        #         print(Fore.GREEN + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated y: ' + str(position_[i,1] - true_pos[1]))
+
+        #     if abs(position_[i,2] - true_pos[2]) > 0.2:
+        #         print(Fore.RED + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated z:' + str(position_[i,2] - true_pos[2]))
+        #     elif abs(position_[i,2] - true_pos[2]) > 0.1:
+        #         print(Fore.YELLOW + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated z:' + str(position_[i,2] - true_pos[2]))
+        #     else:
+        #         print(Fore.GREEN + 'Landmark ID:' + str(self.detected_obj_info['id'][i]) + 'Estimated z: ' + str(position_[i,2] - true_pos[2]))
+        # print(f'-----------------------------------------------------')
+    
 
         # Camera offset:
         x_offset = 0.0412774; y_offset = -0.00469654; z_offset = -0.00405862
@@ -144,6 +173,7 @@ class DjiController (Supervisor):
         self.R = self.Rz @ self.Ry @ self.Rx
 
         position = self.R @ position
+
 
         return position
 
@@ -158,8 +188,8 @@ class DjiController (Supervisor):
         # imu_msg.orientation_covariance = [imu_noise, 0, 0, 0, imu_noise, 0, 0, 0, imu_noise]
         imu_msg.header.stamp = rospy.Time.now()
         self.imu_true_pub.publish(imu_msg)
-
-        # Add random noise to the imu measurements
+        # Add custom defined random noise to the imu measurements
+        
         noise = np.random.normal(0, self.imu_noise, 3) 
         imu_msg.orientation.x += noise[0]
         imu_msg.orientation.y += noise[1]
@@ -167,22 +197,22 @@ class DjiController (Supervisor):
         self.imu_pub.publish(imu_msg)
 
     def read_camera(self):
-        ## INTEGRATED COMPUTATION OF POSITION OF THE CAMERA
+        ## INTEGRATED COMPUTATION OF POSUTION OF THE CAMERA
         ## Extract position of objects detected by the camera.
         self.detected_objects = self.camera.getRecognitionObjects() # List of objects detected by the camera
-        pos = []; orient = []; id = []; image_pos = []; obj_def = []
+        pos = []; orient = []; id = []; obj_model = []; image_pos = []
         for objects in self.detected_objects:
             pos_ = objects.getPosition(); orient_ = objects.getOrientation()
             pos.append(np.array(pos_))
             orient.append(np.array(orient_))
             id.append(objects.getId())
+            obj_model.append(objects.getModel())
             image_pos.append(objects.getPositionOnImage())
-            obj_def.append(self.getFromId(objects.getId()).getDef())
-        
+
         # Create dictionary of detected objects
         self.detected_obj_info = {
             'id': id,
-            'obj_def': obj_def,
+            'name': obj_model,
             'position': pos,
         }
 
@@ -206,8 +236,8 @@ class DjiController (Supervisor):
     def read_uwb(self):
         # Use true position to add noise based on true distance between uwb tags and the anchor (Quadrotor)
         pos = self.gps.getValues()
-        pos[2] = 1.0    # Assume that the altitude is irrelevant (cause we only care about x-y position)
-        max_dist = 10   # [m]
+        pos[2] = 1.0   # Assume that the altitude is irrelevant (cause we only care about x-y position)
+        max_dist = 10#10 # [m]
         available_tags = { 'position': [], 'distance': [] }
         
         # Add gaussian noise to the distance measurement based on the true distance between the uwb tag and the anchor
@@ -253,6 +283,11 @@ class DjiController (Supervisor):
             # Publish the data with a probability of p
             if np.random.rand() < self.pub_uwb_prob:
                 self.uwb_pos_pub.publish(uwb_pos_msg)
+
+            # print(Fore.GREEN + 'x: {:+.4f} [m], y: {:+.4f} [m]'.format(x, y) + Fore.RESET)
+        else:
+            # print(Fore.RED + 'Not enough tags available. ({})'.format(len(available_tags['distance'])) + Fore.RESET)
+            pass
 
     def pos_solver(self, xyz):
         self.x = xyz[0]; self.y = xyz[1]; self.z = xyz[2]
@@ -327,3 +362,44 @@ if __name__ == "__main__":
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# If you want to use this code, you can use this one within the read_camera() function.
+# ## EXTERNAL COMPUTATION OF POSITION OF THE CAMERA
+# ## Extract the position within the image in pixels of the objects detected by the camera.
+# self.detected_objects = self.camera.getRecognitionObjects() # List of objects detected by the camera
+# pos = []; orient = []; id = []; obj_model = []; image_pos = []
+
+# det_obj_msg = detected_landmarks()
+# det_obj_msg.x = []; det_obj_msg.y = []; det_obj_msg.id = []
+
+# for object in self.detected_objects:
+#     pos_ = object.getPositionOnImage()
+#     det_obj_msg.x.append(pos_[0])
+#     det_obj_msg.y.append(pos_[1])
+#     det_obj_msg.id.append(object.getId())
+#     # pos.append(np.array(pos_))
+#     # id.append(object.getId())
+#     # obj_model.append(object.getModel())
+
+# # Publish the message
+# self.detected_landmarks_pub.publish(det_obj_msg)
+# print(f'Published detected landmarks: \n{det_obj_msg}')
